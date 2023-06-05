@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <link rel="stylesheet" href= "style.css"/>
+            <link
+              rel="stylesheet"
+              href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+              integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+              crossorigin="anonymous"
+            />
+            <link
+              rel="stylesheet"
+              href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+              crossorigin="anonymous"
+            />
+            <title>{% block title %}Twitter Search Analysis{% endblock %}</title>
+        <li class="scroll-to-section"><a href="#about" class="">About</a></li>
+    </head>
+    <body>
+        <form method="POST">
+            <h3 align="center">Choose Your Stocks</h3>
+            <div class="form-group">
+                <label for="Stock #1">Stock #1</label>
+                <input
+                    type="text"
+                    class="form-control"
+                    id="Stock #1"
+                    name="Stock #1"
+                    placeholder="Enter Stock Name"
+                />
+            </div>
+            <div class="form-group">
+                <label for="Stock #2">Stock #2</label>
+                <input
+                    type="text"
+                    class="form-control"
+                    id="Stock #2"
+                    name="Stock #2"
+                    placeholder="Enter Stock Name"
+                />
+            </div>
+            <div class="form-group">
+                <label for="Stock #3">Stock #3</label>
+                <input
+                    type="text"
+                    class="form-control"
+                    id="Stock #3"
+                    name="Stock #3"
+                    placeholder="Enter Stock Name"
+                />
+            </div>
+            <div class="form-group">
+                <label for="Stock #4">Stock #4</label>
+                <input
+                    type="text"
+                    class="form-control"
+                    id="Stock #4"
+                    name="Stock #4"
+                    placeholder="Enter Stock Name"
+                />
+            </div>
+            <br />
+            <button id="submitBtn" type="submit" class="btn btn-primary">Search</button>
+
+            <script>
+               
+               function submit(){window.location.href = "charts.html";}
+            </script>
+            
+        </form>
+    </body>
+</html>

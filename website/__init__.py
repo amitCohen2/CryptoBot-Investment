@@ -18,11 +18,13 @@ def create_app():
     from .views import views
     from .auth import auth
     from .twitter import twitter
+    from .arbitrage import arbitrage_blue_print
 
     # Register the blueprints - this is where the routes are defined
     app.register_blueprint(views, url_prefix='/')
     app.register_blueprint(auth, url_prefix='/')
     app.register_blueprint(twitter, url_prefix='/')
+    app.register_blueprint(arbitrage_blue_print, url_prefix='/')
 
     from .modules import User, Note
 

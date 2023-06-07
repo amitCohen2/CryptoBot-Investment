@@ -1,10 +1,54 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Arbitrage Results</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 8px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+    </style>
 </head>
 <body>
-
+    <h1>Arbitrage Results</h1>
+    <table class="arbitrage-table">
+        <thead>
+            <tr>
+                <th>Number</th>
+                <th>Date Time</th>
+                <th>Ask Price</th>
+                <th>Bid Price</th>
+                <th>Exchange 1</th>
+                <th>Exchange 2</th>
+                <th>Symbol</th>
+                <th>Profit</th>
+                <th>Counter</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for entry in output %}
+            <tr>
+                <td>{{ entry.number }}</td>
+                <td>{{ entry.date_time }}</td>
+                <td>{{ entry.ask_price }}</td>
+                <td>{{ entry.bid_price }}</td>
+                <td>{{ entry.exchange1 }}</td>
+                <td>{{ entry.exchange2 }}</td>
+                <td>{{ entry.symbol }}</td>
+                <td>{{ entry.profit }}</td>
+                <td>{{ entry.counter }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </body>
 </html>

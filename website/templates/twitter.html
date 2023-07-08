@@ -1,74 +1,88 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <link rel="stylesheet" href= "style.css"/>
-            <link
-              rel="stylesheet"
-              href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-              integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
-              crossorigin="anonymous"
-            />
-            <link
-              rel="stylesheet"
-              href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
-              crossorigin="anonymous"
-            />
-            <title>{% block title %}Twitter Search Analysis{% endblock %}</title>
-        <li class="scroll-to-section"><a href="#about" class="">About</a></li>
-    </head>
-    <body>
-        <form method="POST">
-            <h3 align="center">Choose Your Stocks</h3>
-            <div class="form-group">
-                <label for="Stock #1">Stock #1</label>
-                <input
-                    type="text"
-                    class="form-control"
-                    id="Stock #1"
-                    name="Stock #1"
-                    placeholder="Enter Stock Name"
-                />
-            </div>
-            <div class="form-group">
-                <label for="Stock #2">Stock #2</label>
-                <input
-                    type="text"
-                    class="form-control"
-                    id="Stock #2"
-                    name="Stock #2"
-                    placeholder="Enter Stock Name"
-                />
-            </div>
-            <div class="form-group">
-                <label for="Stock #3">Stock #3</label>
-                <input
-                    type="text"
-                    class="form-control"
-                    id="Stock #3"
-                    name="Stock #3"
-                    placeholder="Enter Stock Name"
-                />
-            </div>
-            <div class="form-group">
-                <label for="Stock #4">Stock #4</label>
-                <input
-                    type="text"
-                    class="form-control"
-                    id="Stock #4"
-                    name="Stock #4"
-                    placeholder="Enter Stock Name"
-                />
-            </div>
-            <br />
-            <button id="submitBtn" type="submit" class="btn btn-primary">Search</button>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css"/>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" crossorigin="anonymous" />
+    <title>{% block title %}Twitter Search Analysis{% endblock %}</title>
+    
 
-            <script>
-               
-               function submit(){window.location.href = "charts.html";}
-            </script>
-            
-        </form>
-    </body>
+</head>
+<body>
+    <form method="POST">
+        <h3 align="center">Choose Your Crypto Coins</h3>
+        <div class="form-group">
+            <label for="cryptoCoin1">cryptoCoin #1</label>
+            <select class="form-control" id="cryptoCoin1" name="cryptoCoin1"  >
+                <option value="">Select an option</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="cryptoCoin2">cryptoCoin #2</label>
+            <select class="form-control" id="cryptoCoin2" name="cryptoCoin2" >
+                <option value="">Select an option</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="cryptoCoin3">cryptoCoin #3</label>
+            <select class="form-control" id="cryptoCoin3" name="cryptoCoin3" >
+                <option value="">Select an option</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="cryptoCoin4">cryptoCoin #4</label>
+            <select class="form-control" id="cryptoCoin4" name="cryptoCoin4" >
+                <option value="">Select an option</option>
+            </select>
+        </div>
+        <br />
+        <button id="submitBtn" type="submit" class="btn btn-primary">Search</button>
+
+        <script>
+            // Define an array of cryptoCoin names
+            const cryptoCoinNames = [
+                "ETH",
+                "BTC",
+                "ADA",
+                "XRP",
+                "DOGE",
+                "DOT",
+                "UNI",
+                "ICP",
+                "BCH",
+                "LTC",
+                "LINK",
+                "MATIC",
+                "SOL",
+                "ETC",
+                "XLM",
+                "THETA",
+                "VET",
+                "EOS",
+                "BNB"
+                ];
+                cryptoCoinNames.sort();
+            // Function to generate option elements for a given select element
+            function generateOptions(selectId) {
+                const selectElement = document.getElementById(selectId);
+
+                // Iterate over the cryptoCoin names array and create an option element for each cryptoCoin
+                cryptoCoinNames.forEach((cryptoCoin) => {
+                    const optionElement = document.createElement("option");
+                    optionElement.value = cryptoCoin;
+                    optionElement.textContent = cryptoCoin;
+                    selectElement.appendChild(optionElement);
+                });
+            }
+
+            // Generate options for each select element
+            generateOptions("cryptoCoin1");
+            generateOptions("cryptoCoin2");
+            generateOptions("cryptoCoin3");
+            generateOptions("cryptoCoin4");
+        </script>
+    </form>
+</body>
 </html>

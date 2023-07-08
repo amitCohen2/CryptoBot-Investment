@@ -11,7 +11,8 @@ import mpld3
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from IPython.display import display
 from flask import jsonify
-
+import ccxt
+from datetime import datetime, timedelta
 #from . import db
 #from . modules import User
 
@@ -21,16 +22,16 @@ import datetime as DT
 
 # Set up default dates to be fron 90 days ago till today
 today = DT.date.today()
-two_week_ago = str(today - DT.timedelta(days=90))
+two_week_ago = str(today - DT.timedelta(days=14))
 today = str(today)
 
-def gen_sent_graph_nasdaq(stock_symbol, start_date,end_date):
+def gen_sent_graph_nasdaq(coin_symbol, start_date,end_date):
     return
 
 
 
 
-def gen_sent_graph_twitter(stock_symbol, start_date, end_date):
+def gen_sent_graph_twitter(coin_symbol, start_date, end_date):
     import json
     from twython import TwythonStreamer, Twython
     import csv
@@ -64,7 +65,7 @@ def gen_sent_graph_twitter(stock_symbol, start_date, end_date):
                             creds['ACCESS_SECRET'])
 
     # Set up our query parameters based on user input
-    search1 = stock_symbol
+    search1 = coin_symbol
     slang = 'en'
     scount = 10000
     TimeSearch = start_date
@@ -79,7 +80,7 @@ def gen_sent_graph_twitter(stock_symbol, start_date, end_date):
              'until': TimeSearchEnd,
              }
 
-    # Search tweets for tweets mentioning stock symbol
+    # Search tweets for tweets mentioning coin symbol
     dict_ = {'user': [], 'date': [], 'text': [], 'favorite_count': []}
     for status in python_tweets.search(**query)['statuses']:
         dict_['user'].append(status['user']['screen_name'])
@@ -136,7 +137,7 @@ def gen_sent_graph_twitter(stock_symbol, start_date, end_date):
     max_fav = df.iloc[0]['favorite_count']
     df = df.reset_index()
 
-    # Calculate stock operations by their weights
+    # Calculate coin operations by their weights
     for index, row in df.iterrows():
         # the tweet with the most likes gets a weight of 1,
         # the rest are weighed in relation to that
@@ -167,53 +168,109 @@ def gen_sent_graph_twitter(stock_symbol, start_date, end_date):
     y_temp = [c_buy, c_sell, c_hold]
     x_axis = ['Buy', 'Sell', 'Hold']
     x_axis_categories_values = [c_buy, c_sell, c_hold]
-    percentages = [(sentiment / total) * 100 for sentiment in x_axis_categories_values]
+    if total == 0:
+        percentages = [0, 0, 0]
+    else:
+        percentages = [(sentiment / total) * 100 for sentiment in x_axis_categories_values]
     data = {
-    "stock name":stock_symbol,
+    "coin name":coin_symbol,
     "percentages": percentages,
     "x_axis": x_axis,
     "x_axis_categories_values": x_axis_categories_values
     }
 
     json_data = json.dumps(data)
-    #fig, ax = plt.subplots()
-
-    """
-    ax.bar(x_axis, percentages, color=['green', 'red', 'blue'], edgecolor='black', linewidth=1, capstyle='round', joinstyle='round')
-    # Set y-axis tick labels as percentages
-    ax.yaxis.set_major_formatter(mtick.PercentFormatter())
-    # Set y-axis tick locator
-    ax.yaxis.set_major_locator(mtick.MultipleLocator(base=10))
-    # Set y-axis limits
-    ax.set_ylim([0, 100])
-
-    plt.title(f'Sentiment around the stock {search1}')
-    plt.xlabel('Sentiment')
-    plt.ylabel('Positive/Neutral/Negative mentions')
-    #plt.show()
-    """
+   
     return json_data
 
 
-def run_stock_twitter(list_stock_symbol, start_date=two_week_ago, end_date=today):
-    stocks = []
-    for i in range(4):
-        stock_data = gen_sent_graph_twitter(list_stock_symbol[i], start_date, end_date)
-        #buffer = io.BytesIO()
-        #fig.savefig(buffer, format='png')
-        #buffer.seek(0)
-        #plot_data.append(base64.b64encode(buffer.getvalue()).decode())
-        #plt.close(fig)
-        stocks.append(stock_data)
-    return stocks
+def run_coin_twitter(list_coin_symbol, start_date=two_week_ago, end_date=today):
+    coins = []
+    num_of_coins =4# len(list_coin_symbol)
+    #for i in range(4):
+    for symbol in list_coin_symbol:
+        coin_data = get_data_on_coin(symbol, start_date, end_date)
+        coins.append(coin_data)
+    return coins
+
+def get_data_on_coin(symbol, start_date, end_date):
+    coin = []
+    word_json = {}
+    word__json_array = []
+    percentages = [0,0,0]
+    x_axis_categories_values = [0,0,0]
+    keywords = convert_symbol_to_keywords(symbol)
+    for word in keywords:
+        word_json = gen_sent_graph_twitter(word, start_date, end_date)
+        word__json_array.append(word_json)
+    for json_data in word__json_array:
+        json_data = json.loads(json_data)
+        x_axis_categories_values[0] += json_data.get("x_axis_categories_values", [])[0]
+        x_axis_categories_values[1] += json_data.get("x_axis_categories_values", [])[1]
+        x_axis_categories_values[2] += json_data.get("x_axis_categories_values", [])[2]
+        
+
+    total = x_axis_categories_values[0] + x_axis_categories_values[1] + x_axis_categories_values[2]
+    percentages[0] = (x_axis_categories_values[0] / total) * 100
+    percentages[1] = (x_axis_categories_values[1] / total) * 100
+    percentages[2] = (x_axis_categories_values[2] / total) * 100
+
+    return {'coin name': symbol, 'percentages': percentages, 'x_axis': ['Buy','Sell','Hold'], 'x_axis_categories_values': x_axis_categories_values}
+
+def convert_symbol_to_keywords(symbol):
+    keywords = []
+    if symbol == 'ETH':
+        keywords = ['#ETHUSD', 'ETH', 'Ethereum', '#ETH', 'ETHUSD', '#Ether']
+    elif symbol == 'USDT':
+        keywords = ['#USDTUSD', 'USDT', '#USDT', 'USDTUSD']
+    elif symbol == 'BTC':
+        keywords = ['#BTCUSD', 'Bitcoin', '#BTC', 'BTCUSD']
+    elif symbol == 'ADA':
+        keywords = ['#ADAUSD', '#ADAUSDT', '#ADA', 'ADAUSD']
+    elif symbol == 'XRP':
+         keywords = ['#XRPUSD', '#XRPUSDT', '#XRP', 'XRPUSD']
+    elif symbol == 'DOGE':
+          keywords = ['#DOGEUSD', '#DOGEUSDT', '#DOGE', 'DOGEUSD']
+    elif symbol == 'DOT':
+        keywords = ['#DOTUSD', '#DOTUSDT', '#DOT', 'DOTUSD']
+    elif symbol == 'UNI':
+        keywords = ['#UNIUSD', '#UNIUSDT', '#UNI', 'UNIUSD']
+    elif symbol == 'ICP':
+        keywords = ['#ICPUSD', '#ICPUSDT', '#ICP', 'ICPUSD']
+    elif symbol == 'BCH':
+        keywords = ['#BCHUSD', '#BCHUSDT', '#BCH', 'BCHUSD']
+    elif symbol == 'LTC':
+        keywords = ['#LTCUSD', '#LTCUSDT', '#LTC', 'LTCUSD']
+    elif symbol == 'LINK':
+        keywords = ['#LINKUSD', '#LINKUSDT', '#LINK', 'LINKUSD']
+    elif symbol == 'MATIC':
+        keywords = ['#MATICUSD', '#MATICUSDT', '#MATIC', 'MATICUSD']
+    elif symbol == 'SOL':
+        keywords = ['#SOLUSD', '#SOLUSDT', '#SOL', 'SOLUSD']
+    elif symbol == 'ETC':
+        keywords = ['#ETCUSD', '#ETCUSDT', '#ETC', 'ETCUSD']
+    elif symbol == 'XLM':
+        keywords = ['#XLMUSD', '#XLMUSDT', '#XLM', 'XLMUSD']
+    elif symbol == 'THETA':
+        keywords = ['#THETAUSD', '#THETAUSDT', '#THETA', 'THETAUSD']
+    elif symbol == 'VET':
+        keywords = ['#VETUSD', '#VETUSDT', '#VET', 'VETUSD']
+    elif symbol == 'EOS':
+        keywords = ['#EOSUSD', '#EOSUSDT', '#EOS', 'EOSUSD']
+    elif symbol == 'BNB':
+        keywords = ['#BNBUSD', '#BNBUSDT', '#BNB', 'BNBUSD']
+
+    return keywords
+    
 
 
-def run_stock_nasdaq(list_stock_symbol, start_date=two_week_ago, end_date=today):
+
+def run_coin_nasdaq(list_coin_symbol, start_date=two_week_ago, end_date=today):
     plot_data = []
     api_key = '6P03OIQGX3TR7PH1'
-    stocks =[]
-    fig, axs = plt.subplots(nrows=len(list_stock_symbol), ncols=1, figsize=(10, 10))
-    for i, symbol in enumerate(list_stock_symbol):
+    coins =[]
+    fig, axs = plt.subplots(nrows=len(list_coin_symbol), ncols=1, figsize=(10, 10))
+    for i, symbol in enumerate(list_coin_symbol):
         url = f'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol={symbol}&apikey={api_key}&outputsize=full'
         response = requests.get(url)
         prices = []
@@ -226,30 +283,36 @@ def run_stock_nasdaq(list_stock_symbol, start_date=two_week_ago, end_date=today)
                 dates.append(date)
                 prices.append(float(timeseries[date]['4. close']))
                 
-        #axs[i].plot(dates, prices)
-       # axs[i].set_title(symbol)
-        #axs[i].set_ylabel('Price')
-       # axs[i].tick_params(axis='x', rotation=90)
+        
         {"name": symbol,"dates": dates, "prices": prices}
-        stocks.append({"name": symbol,"dates": dates, "prices": prices})
-    """
-    fig.tight_layout()
-    buffer = io.BytesIO()
-    plt.savefig(buffer, format='png')
-    buffer.seek(0)
-    image = base64.b64encode(buffer.getvalue()).decode('utf-8')
-    plot_data.append(base64.b64encode(buffer.getvalue()).decode())
-    #plt.show()
-    plt.close(fig)
-    """
-    return stocks
+        coins.append({"name": symbol,"dates": dates, "prices": prices})
+  
+    return coins
 
-    #return render_template('stocks.html', image=image)
+    #return render_template('coins.html', image=image)
 
 
+def get_historical_data(symbol_list):
+    exchange = ccxt.binance()
+    coins = []
+    timeframe = '1d'
+    today = datetime.now()
+    start_date = today - timedelta(days=365)
+    end_date = today
+    start_date_timestamp = int(start_date.timestamp() * 1000)
+    end_date_timestamp = int(end_date.timestamp() * 1000)
 
+    for symbol in symbol_list:
+        convert_symbol = symbol + '/USDT'
+        historical_data = exchange.fetch_ohlcv(convert_symbol, timeframe, start_date_timestamp, end_date_timestamp)
 
+        # Extract dates and prices from historical data
+        dates = [datetime.fromtimestamp(item[0] / 1000) for item in historical_data]
+        prices = [item[4] for item in historical_data]  # Closing prices
 
+        coins.append({"name": symbol, "dates": dates, "prices": prices})
+
+    return coins
     
 
 
@@ -259,55 +322,42 @@ twitter = Blueprint('twitter', __name__)
 @login_required
 def twitter_nlp():
     list = []
+    coins = []
     if request.method == 'POST':
-        stock_name_1 = request.form['Stock #1']
-        stock_name_2 = request.form['Stock #2']
-        stock_name_3 = request.form['Stock #3']
-        stock_name_4 = request.form['Stock #4']
+        coin_name_1 = request.form['cryptoCoin1']
+        coin_name_2 = request.form['cryptoCoin2']
+        coin_name_3 = request.form['cryptoCoin3']
+        coin_name_4 = request.form['cryptoCoin4']
+        # #BTC , Bitcoin, #BTCUSDT , BTCUSD
+        coin_names = [coin_name_1, coin_name_2, coin_name_3, coin_name_4]
+        for coin in coin_names:
+            if coin.strip():  # Skip if coin is an empty string or contains only whitespace
+                coins.append(coin)
+        #list.append(coin_name_1)
+        #list.append(coin_name_2)
+        #list.append(coin_name_3)
+        #list.append(coin_name_4)
 
-        list.append(stock_name_1)
-        list.append(stock_name_2)
-        list.append(stock_name_3)
-        list.append(stock_name_4)
-
-        data_nasdaq = run_stock_nasdaq(list)
-        data_twitter = run_stock_twitter(list)
-        stock1 =json.loads(data_twitter[0])
-        stock2 =json.loads(data_twitter[1])
-        stock3 =json.loads(data_twitter[2])
-        stock4 =json.loads(data_twitter[3])
-
+        #historic_data = run_coin_nasdaq(list)
+        historic_data = get_historical_data(coins)
+        data_twitter = run_coin_twitter(coins)
+        json_obj = {}
         
-       # json_array =json.dumps(json_array, indent=4)
-       
-        json_obj = {
-        'stock_name_1': stock1['stock name'],
-        'stock_dates_1': data_nasdaq[0]['dates'],
-        'stock_prices_1': data_nasdaq[0]['prices'],
-        'percentages_1': stock1['percentages'],
-        'x_axis_1': stock1['x_axis'],
-        'x_axis_categories_values_1': stock1['x_axis_categories_values'],
-        'stock_name_2':stock2['stock name'],
-        'stock_dates_2': data_nasdaq[1]['dates'],
-        'stock_prices_2': data_nasdaq[1]['prices'],
-        'percentages_2': stock2['percentages'],
-        'x_axis_2': stock2['x_axis'],
-        'x_axis_categories_values_2': stock2['x_axis_categories_values'],
-        'stock_name_3': stock3['stock name'],
-        'stock_dates_3': data_nasdaq[2]['dates'],
-        'stock_prices_3': data_nasdaq[2]['prices'],
-        'percentages_3': stock3['percentages'],
-        'x_axis_3': stock3['x_axis'],
-        'x_axis_categories_values_3': stock3['x_axis_categories_values'],
-        'stock_name_4':stock4['stock name'],
-        'stock_dates_4': data_nasdaq[3]['dates'],
-        'stock_prices_4': data_nasdaq[3]['prices'],
-        'percentages_4': stock4['percentages'],
-        'x_axis_4': stock4['x_axis'],
-        'x_axis_categories_values_4': stock4['x_axis_categories_values']
+        for i, coin in enumerate(data_twitter, start=1):
+            coin_name_key = f'coin_name_{i}'
+            coin_dates_key = f'coin_dates_{i}'
+            coin_prices_key = f'coin_prices_{i}'
+            percentages_key = f'percentages_{i}'
+            x_axis_key = f'x_axis_{i}'
+            x_axis_categories_values_key = f'x_axis_categories_values_{i}'
 
-         }
-    
+            json_obj[coin_name_key] = coin['coin name']
+            json_obj[coin_dates_key] = historic_data[i - 1]['dates']
+            json_obj[coin_prices_key] = historic_data[i - 1]['prices']
+            json_obj[percentages_key] = coin['percentages']
+            json_obj[x_axis_key] = coin['x_axis']
+            json_obj[x_axis_categories_values_key] = coin['x_axis_categories_values']
+        json_obj['num_of_coins'] = len(data_twitter)
         return render_template('charts.html', user=current_user, plot_data=json_obj)                                           
     else:
         return render_template('twitter.html', user=current_user)

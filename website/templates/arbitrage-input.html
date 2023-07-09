@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Arbitrage</title>
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        .submit-button {
+            cursor: pointer;
+            outline: 0;
+            display: inline-block;
+            font-weight: 400;
+            line-height: 1.5;
+            text-align: center;
+            background-color: transparent;
+            border: 1px solid transparent;
+            padding: 6px 12px;
+            font-size: 1rem;
+            border-radius: .25rem;
+            transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+            color: #13aa52;
+            border-color: #13aa52;
+        }
+
+        .submit-button:hover {
+            color: #fff;
+            background-color: #13aa52;
+            border-color: #13aa52;
+        }
+    </style>
+</head>
+<body>
+    <h1>Arbitrage</h1><br>
+
+    <form action="/arbitrage" method="POST">
+        <label for="input-amount">Enter an amount to invest:</label>
+        <input type="text" id="input-amount" name="amount" pattern="\d+"
+               title="Please enter a valid integer number" required>
+        <br><br>
+        <input type="submit" value="Submit" class="submit-button">
+    </form>
+</body>
+</html>

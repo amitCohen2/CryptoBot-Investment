@@ -7,38 +7,63 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous" />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" crossorigin="anonymous" />
     <title>{% block title %}Twitter Search Analysis{% endblock %}</title>
-    
+    <style>
+
+        .forms {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            grid-template-rows: repeat(5, 1fr);
+            grid-column-gap: 0px;
+            grid-row-gap: 0px;
+            text-align: center;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .form-group1 { grid-area: 1 / 3 / 2 / 4; }
+        .form-group2 { grid-area: 2 / 3 / 3 / 4; }
+        .form-group3 { grid-area: 3 / 3 / 4 / 4; }
+        .form-group4 { grid-area: 4 / 3 / 5 / 4; }
+        .search-button { grid-area: 5 / 3 / 6 / 4; }
+    </style>
 
 </head>
 <body>
-    <form method="POST">
+    <form method="POST" class="form-container">
+        <br>
         <h3 align="center">Choose Your Crypto Coins</h3>
-        <div class="form-group">
+        <br>
+        <div class="forms">
+                    <div class="form-group1">
             <label for="cryptoCoin1">cryptoCoin #1</label>
             <select class="form-control" id="cryptoCoin1" name="cryptoCoin1"  >
                 <option value="">Select an option</option>
             </select>
         </div>
-        <div class="form-group">
+        <div class="form-group2">
             <label for="cryptoCoin2">cryptoCoin #2</label>
             <select class="form-control" id="cryptoCoin2" name="cryptoCoin2" >
                 <option value="">Select an option</option>
             </select>
         </div>
-        <div class="form-group">
+        <div class="form-group3">
             <label for="cryptoCoin3">cryptoCoin #3</label>
             <select class="form-control" id="cryptoCoin3" name="cryptoCoin3" >
                 <option value="">Select an option</option>
             </select>
         </div>
-        <div class="form-group">
+        <div class="form-group4">
             <label for="cryptoCoin4">cryptoCoin #4</label>
             <select class="form-control" id="cryptoCoin4" name="cryptoCoin4" >
                 <option value="">Select an option</option>
             </select>
         </div>
-        <br />
-        <button id="submitBtn" type="submit" class="btn btn-primary">Search</button>
+        <br><br>
+        <div class="search-button">
+            <button id="submitBtn" type="submit" class="btn btn-primary">Search</button>
+        </div>
+        </div>
+
 
         <script>
             // Define an array of cryptoCoin names

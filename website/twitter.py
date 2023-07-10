@@ -333,12 +333,7 @@ def twitter_nlp():
         for coin in coin_names:
             if coin.strip():  # Skip if coin is an empty string or contains only whitespace
                 coins.append(coin)
-        #list.append(coin_name_1)
-        #list.append(coin_name_2)
-        #list.append(coin_name_3)
-        #list.append(coin_name_4)
 
-        #historic_data = run_coin_nasdaq(list)
         historic_data = get_historical_data(coins)
         data_twitter = run_coin_twitter(coins)
         json_obj = {}
@@ -361,8 +356,8 @@ def twitter_nlp():
         return render_template('charts.html', user=current_user, plot_data=json_obj)                                           
     else:
         return render_template('twitter.html', user=current_user)
-    
-     #render_template('charts.html', user=current_user, plot_data=json_obj) #jsonify(json_obj) #render_template('charts.html', user=current_user, plot_data=json_array)
+
+
 @twitter.route('/charts', methods=['GET'])
 @login_required
 def charts():

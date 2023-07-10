@@ -246,7 +246,11 @@ def run_machine_learning_prediction():
         return render_template('machine-learning-prediction.html', user=current_user)
     else:
         # update the symbol from the user choice
+
         config["alpha_vantage"]["symbol"] = request.form["stock"]
+
+        if not config["alpha_vantage"]["symbol"].strip():  # Skip if coin is an empty string or contains only whitespace
+            return render_template('machine-learning-charts.html', user=current_user, plot_data=encoded_images_list)
 
         data_date, data_close_price, num_data_points, display_date_range = download_data(config)
         # plot
@@ -464,9 +468,13 @@ def run_machine_learning_prediction():
         plt.legend()
         #plt.show()
         add_to_encoded_list(fig)
-
-        print("Predicted close price of the next trading day:", round(to_plot_data_y_test_pred[plot_range - 1], 2))
-        return render_template('machine-learning-charts.html', user=current_user, plot_data=encoded_images_list)
+        result_message = "Predicted close price of the next trading day: " + \
+                         str(round(to_plot_data_y_test_pred[plot_range - 1], 2))
+        print(result_message)
+        return render_template('machine-learning-charts.html',
+                               user=current_user,
+                               plot_data=encoded_images_list,
+                               predicted_price_next_day=result_message)
 
 
 @machine_learning.route('/machine-learning-charts', methods=['GET'])

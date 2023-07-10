@@ -12,13 +12,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Machine Learning Analysis</title>
   <style>
-        .chart-image {
-            width: 750%;
-            max-width: 1000px;
+        .chart-image  {
+            width: 95%;
             height: auto;
             margin-bottom: 20px;
         }
-
+        .predicted-price {
+            text-align: center;
+        }
   </style>
 </head>
 <body>
@@ -27,6 +28,7 @@
             <!-- Display the chart image if available -->
             <img class="chart-image" src="data:image/png;base64,{{ chart }}" alt="Prediction Chart"><br><br>
         {% endfor %}
+        <p class="predicted-price">{{ predicted_price_next_day }}</p>
     {% else %}
         <p>No chart data available</p>
     {% endif %}

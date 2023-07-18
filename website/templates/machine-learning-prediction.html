@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css"/>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" crossorigin="anonymous" />
+    <title>{% block title %}Machine Learning Prediction{% endblock %}</title>
+    <style>
+        .form-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(4, 1fr);
+            grid-column-gap: 0px;
+            grid-row-gap: 0px;
+            text-align: center;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .header {grid-area: 1 / 2 / 2 / 3;}
+        .form-group { grid-area: 2 / 2 / 3 / 3; }
+        .search-button { grid-area: 3 / 2 / 4 / 3; }
+    </style>
+</head>
+<body>
+<br>
+    <form method="POST" class="form-container">
+        <h3 align="center" class="header">Choose Your Stock</h3>
+        <div class="form-group">
+            <label for="stock">Choose a stock to predict by machine learning algorithm:</label>
+            <select class="form-control" id="stock" name="stock">
+                <option value="" class="option">Select an option</option>
+            </select>
+        </div>
+        <div class="search-button">
+            <button id="submitBtn" type="submit" class="btn btn-primary">Search</button>
+        </div>
+        <script>
+            // Define an array of stocks names
+            const stocks_list = [
+                "ETH",
+                "BTC",
+                "ADA",
+                "XRP",
+                "DOGE",
+                "DOT",
+                "UNI",
+                "ICP",
+                "BCH",
+                "LTC",
+                "LINK",
+                "MATIC",
+                "SOL",
+                "ETC",
+                "XLM",
+                "THETA",
+                "VET",
+                "EOS",
+                "BNB"
+                ];
+                stocks_list.sort();
+            // Function to generate option elements for a given select element
+            function generateOptions(selectId) {
+                const selectElement = document.getElementById(selectId);
+
+                // Iterate over the stock names array and create an option element for each stock
+                stocks_list.forEach((stock) => {
+                    const optionElement = document.createElement("option");
+                    optionElement.value = stock;
+                    optionElement.textContent = stock;
+                    selectElement.appendChild(optionElement);
+                });
+            }
+
+            // Generate options for each select element
+            generateOptions("stock");
+        </script>
+    </form>
+</body>
+</html>

@@ -1,10 +1,156 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <meta http-equiv="refresh" content="2" id="refreshInterval">
+    <link rel="stylesheet" href="arbitrage.css">
+    <title>Arbitrage Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 8px;
+            text-align: center;
+        }
+
+        tr {
+            border-bottom: 1px solid #ddd;
+        }
+
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .fade-in {
+            opacity: 0;
+            animation: fadeIn 1s ease-in-out forwards;
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .buttons {
+            text-align: center;
+        }
+
+        .stop, .back {
+            cursor: pointer;
+            outline: 0;
+            display: inline-block;
+            font-weight: 400;
+            line-height: 1.5;
+            text-align: center;
+            background-color: transparent;
+            border: 1px solid transparent;
+            padding: 6px 12px;
+            font-size: 1rem;
+            border-radius: .25rem;
+            transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+            color: #0d6efd;
+            border-color: #0d6efd;
+        }
+        .back:hover , .stop:hover {
+            color: #fff;
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+        }
+        .stop {
+            color: #ff4742;
+            border-color: #ff4742;
+        }
+        .stop:hover {
+            background-color: #ff4742;
+            border-color: #ff4742;
+        }
+
+        body {
+                background-color: #EFFDED !important;
+        }
+
+    </style>
 </head>
 <body>
+    <h1>Arbitrage Results</h1>
+    <div class="buttons">
+        <button id="stop-button" class="stop">Stop!</button>
+        <button onclick="history.back()" class="back">Go Back</button><br><br>
+    </div>
+    <table class="arbitrage-table">
+        <thead>
+            <tr>
+                <th>Number</th>
+                <th>Date Time</th>
+                <th>Ask Price</th>
+                <th>Bid Price</th>
+                <th>Exchange 1</th>
+                <th>Exchange 2</th>
+                <th>Symbol</th>
+                <th>Profit</th>
+                <th>Counter</th>
+            </tr>
+        </thead>
+        <tbody class="arbitrage-table-body">
+            {% for entry in output %}
+            <tr>
+                <td>{{ entry.number }}</td>
+                <td>{{ entry.date_time }}</td>
+                <td>{{ entry.ask_price }}</td>
+                <td>{{ entry.bid_price }}</td>
+                <td>{{ entry.exchange1 }}</td>
+                <td>{{ entry.exchange2 }}</td>
+                <td>{{ entry.symbol }}</td>
+                <td>
+                    <span style="color: green;">+ {{ entry.profit }}</span>
+                </td>
+                <td>
+                    <span style="color: green;">{{ entry.counter }}</span>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            const cells = document.querySelectorAll('.arbitrage-table-body td');
+            let index = 0;
+            let intervalId = null;
 
+            function fadeInCell() {
+                if (index < cells.length) {
+                    cells[index].classList.add('fade-in');
+                    index++;
+                }
+            }
+
+            intervalId = setInterval(fadeInCell, 100);
+
+            document.getElementById('stop-button').addEventListener('click', () => {
+                stopPythonScript()
+                window.stop()
+            });
+        });
+
+        function stopPythonScript() {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "/arbitrage", true);
+            xhr.send();
+        }
+
+
+    </script>
 </body>
 </html>

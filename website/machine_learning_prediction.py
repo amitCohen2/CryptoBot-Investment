@@ -14,6 +14,8 @@ from alpha_vantage.timeseries import TimeSeries
 from flask import render_template, Blueprint, request
 import base64
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from datetime import datetime, timedelta
+import ccxt
 
 encoded_images_list = []
 
@@ -25,7 +27,7 @@ config = {
         "key_adjusted_close": "5. adjusted close",
     },
     "data": {
-        "window_size": 20,
+        "window_size": 30,
         "train_split_size": 0.80,
     },
     "plots": {
@@ -40,34 +42,72 @@ config = {
     "model": {
         "input_size": 1, # since we are only using 1 feature, close price
         "num_lstm_layers": 2,
-        "lstm_size": 32,
+        "lstm_size": 64,
         "dropout": 0.2,
     },
     "training": {
         "device": "cpu", # "cuda" or "cpu"
-        "batch_size": 64,
-        "num_epoch": 100,
-        "learning_rate": 0.01,
-        "scheduler_step_size": 40,
+        "batch_size": 128,
+        "num_epoch": 150,
+        "learning_rate": 0.001,
+        "scheduler_step_size": 60,
     }
 }
-
-
+"""
 def download_data(config):
     ts = TimeSeries(key=config["alpha_vantage"]["key"])
-    data, meta_data = ts.get_daily_adjusted(config["alpha_vantage"]["symbol"],
-                                            outputsize=config["alpha_vantage"]["outputsize"])
-
+    
+    # Calculate the start date as 10 years ago from the current date
+    end_date = datetime.now().strftime("%Y-%m-%d")
+    start_date = (datetime.now() - timedelta(days=365 * 10)).strftime("%Y-%m-%d")
+    data  = ccxt.binance().fetch_ohlcv(config["alpha_vantage"]["symbol"]+'/USDT', timeframe='1d', since=None, limit=1000)
+   # data, meta_data = ts.get_daily_adjusted(symbol=config["alpha_vantage"]["symbol"],
+   #                                         outputsize=config["alpha_vantage"]["outputsize"])
+   # 
+    # Filter data for the last 10 years
+    data = {date: values for date, values in data.items() if start_date <= date <= end_date}
+    
     data_date = [date for date in data.keys()]
     data_date.reverse()
-
+    
     data_close_price = [float(data[date][config["alpha_vantage"]["key_adjusted_close"]]) for date in data.keys()]
     data_close_price.reverse()
     data_close_price = np.array(data_close_price)
+    
+    num_data_points = len(data_date)
+    display_date_range = "from " + data_date[0] + " to " + data_date[num_data_points - 1]
+    print("Number data points:", num_data_points, display_date_range)
+    
+    return data_date, data_close_price, num_data_points, display_date_range
+    """
+def download_data(config):
+    # Calculate the start date as 10 years ago from the current date
+    end_date = datetime.now().timestamp()
+    start_date = (datetime.now() - timedelta(days=365 * 10)).timestamp()
+    exchange = ccxt.binance()
+   
+    today = datetime.now()
+    start_date = today - timedelta(days=365)
+    end_date = today
+    # Fetch OHLCV data from Binance
+    
+    ohlcv_data = exchange.fetch_ohlcv(config["alpha_vantage"]["symbol"]+'/USDT', timeframe='1d', limit=3650)
+
+    data_date = []
+    data_close_price = []
+    for data in ohlcv_data:
+        timestamp, open_price, high, low, close_price, volume = data
+        date = datetime.fromtimestamp(timestamp / 1000).strftime("%Y-%m-%d")
+        data_date.append(date)
+        data_close_price.append(close_price)
+
+    #data_date.reverse()
+    #data_close_price.reverse()
+    data_close_price = np.array(data_close_price)
 
     num_data_points = len(data_date)
-    display_date_range = "from " + data_date[0] + " to " + data_date[num_data_points-1]
-    print("Number data points", num_data_points, display_date_range)
+    display_date_range = "from " + data_date[0] + " to " + data_date[num_data_points - 1]
+    print("Number of data points:", num_data_points, display_date_range)
 
     return data_date, data_close_price, num_data_points, display_date_range
 
@@ -385,21 +425,20 @@ def run_machine_learning_prediction():
 
         fig = figure(figsize=(25, 5), dpi=80)
         fig.patch.set_facecolor((1.0, 1.0, 1.0))
-        plt.plot(data_date, data_close_price, label="Actual prices", color=config["plots"]["color_actual"])
-        plt.plot(data_date, to_plot_data_y_train_pred, label="Predicted prices (train)",
-                 color=config["plots"]["color_pred_train"])
-        plt.plot(data_date, to_plot_data_y_val_pred, label="Predicted prices (validation)",
-                 color=config["plots"]["color_pred_val"])
+        plt.plot(data_date[::-1], data_close_price, label="Actual prices", color=config["plots"]["color_actual"])
+        plt.plot(data_date[::-1], to_plot_data_y_train_pred, label="Predicted prices (train)",
+                color=config["plots"]["color_pred_train"])
+        plt.plot(data_date[::-1], to_plot_data_y_val_pred, label="Predicted prices (validation)",
+                color=config["plots"]["color_pred_val"])
         plt.title("Compare predicted prices to actual prices")
         xticks = [
             data_date[i] if ((i % config["plots"]["xticks_interval"] == 0 and (num_data_points - i) > config["plots"][
                 "xticks_interval"]) or i == num_data_points - 1) else None for i in
             range(num_data_points)]  # make x ticks nice
+        xticks = xticks[::-1]  # Reverse the xticks array
         x = np.arange(0, len(xticks))
         plt.xticks(x, xticks, rotation='vertical')
-        #    plt.grid(b=None, which='major', axis='y', linestyle='--')
         plt.legend()
-        #plt.show()
         add_to_encoded_list(fig)
         # prepare data for plotting the zoomed in view of the predicted prices vs. actual prices
 
@@ -460,6 +499,7 @@ def run_machine_learning_prediction():
                  color=config["plots"]["color_actual"])
         plt.plot(plot_date_test, to_plot_data_y_val_pred, label="Past predicted prices", marker=".", markersize=10,
                  color=config["plots"]["color_pred_val"])
+        
         plt.plot(plot_date_test, to_plot_data_y_test_pred, label="Predicted price for next day", marker=".",
                  markersize=20,
                  color=config["plots"]["color_pred_test"])
@@ -468,6 +508,7 @@ def run_machine_learning_prediction():
         plt.legend()
         #plt.show()
         add_to_encoded_list(fig)
+        
         result_message = "Predicted close price of the next trading day: " + \
                          str(round(to_plot_data_y_test_pred[plot_range - 1], 2))
         print(result_message)

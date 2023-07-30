@@ -15,9 +15,24 @@ import ccxt
 from datetime import datetime, timedelta
 #from . import db
 #from . modules import User
-
+import json
+import csv
+import pandas as pd
+import matplotlib.pyplot as plt
+import nltk
+from nltk.corpus import wordnet as wn
+import snscrape.modules.twitter as sntwitter
 
 import datetime as DT
+import json
+from twython import TwythonStreamer, Twython
+import csv
+import pandas as pd
+import matplotlib.pyplot as plt
+import nltk
+from nltk.corpus import wordnet as wn
+
+   
 
 
 # Set up default dates to be fron 90 days ago till today
@@ -30,25 +45,33 @@ def gen_sent_graph_nasdaq(coin_symbol, start_date,end_date):
 
 
 
-
 def gen_sent_graph_twitter(coin_symbol, start_date, end_date):
-    import json
-    from twython import TwythonStreamer, Twython
-    import csv
-    import pandas as pd
-    import matplotlib.pyplot as plt
-    import nltk
     dler = nltk.downloader.Downloader()
     dler._update_index()
     dler.download('popular', quiet=True)
-    from nltk.corpus import wordnet as wn
-
     # Credentials we've got through twitter
+   # credentials = {}
+   # credentials['CONSUMER_KEY'] = 'edBhNzXfSM9Ii15eOsjrgh3C2'
+   # credentials['CONSUMER_SECRET'] = 'V7aX8lRZdr6YtE4PTxPbL1ocmZM44yEIiYyYgVSm3nruSoofEO'
+    #credentials['ACCESS_TOKEN'] = '1676865729239326721-rHGL0zh1XOrCHMxvZJdLWndY0k15Qm'
+    #credentials['ACCESS_SECRET'] = 'WTplqesm9IwbX5BOOWDa9Xam7ajUdzHoiSMEh7kEoMJpl'
+
+      #Credentials we've got through twitter
     credentials = {}
-    credentials['CONSUMER_KEY'] = 'ZLn6F7PRT8s5ZJgzkFBt6pkMB'
-    credentials['CONSUMER_SECRET'] = 'wGCvBFK9GLpVR277TkjPkINCa0e37rNjY93pPRvNJS1vdTGr5e'
-    credentials['ACCESS_TOKEN'] = '1314201877546901506-9uHbSbBBxiSRL26x3Bh2RRD9x7iVmO'
-    credentials['ACCESS_SECRET'] = 'azdziHOFiKxvbld8yfNqDoQDdZvdXpbRPbmlOK2cFXAIB'
+    #credentials['CONSUMER_KEY'] = 'rlqZBXDffdBlyhBf1Kj9fVYe4'
+    credentials['CONSUMER_KEY'] =  'oaBQzBYyWqvxLimS8DvU6nCIx'
+    #credentials['CONSUMER_KEY'] =  'ZLn6F7PRT8s5ZJgzkFBt6pkMB'
+    credentials['CONSUMER_SECRET'] = 'dnp94R3etPLNmBVNB85IgkNex56TSTxVbYLayqdmRuppYBQ50z'
+    #credentials['CONSUMER_SECRET'] = 'wGCvBFK9GLpVR277TkjPkINCa0e37rNjY93pPRvNJS1vdTGr5e'
+    credentials['ACCESS_TOKEN'] = '1314201877546901506-lwjqsDq3HO3HWiE8fbzRY5OpBhAYgW'
+    #credentials['ACCESS_TOKEN'] = '1314201877546901506-9uHbSbBBxiSRL26x3Bh2RRD9x7iVmO'
+    credentials['ACCESS_SECRET'] = 'lXWRCRhpdjlCvElpaVTRtbDbpwoBeFlSCRVrttTbS6f09'
+
+    #credentials = {}
+    #credentials['CONSUMER_KEY'] = 'rlqZBXDffdBlyhBf1Kj9fVYe4'
+    #credentials['CONSUMER_SECRET'] = 'xhw2FitCMZbVx0XxBN2fFZkZoGv1C5QEkOaUbOqk631LBJAxMk'
+    #credentials['ACCESS_TOKEN'] = '3017621772-G0jXLYKF88JAr17JK4sUYcTYCGOfc0LRTqr6CML'
+    #credentials['ACCESS_SECRET'] = 'P82g6pUTh9EUVL8lXAFLtzknTKwrKctd40BdIcogLycRr'
 
     # Save the credentials object to file
     with open("twitter_credentials.json", "w") as file:
@@ -58,11 +81,8 @@ def gen_sent_graph_twitter(coin_symbol, start_date, end_date):
     with open("twitter_credentials.json", "r") as file:
         creds = json.load(file)
 
-        # Instantiate an object
-    python_tweets = Twython(creds['CONSUMER_KEY'],
-                            creds['CONSUMER_SECRET'],
-                            creds['ACCESS_TOKEN'],
-                            creds['ACCESS_SECRET'])
+    # Instantiate an object
+    python_tweets = Twython(creds['CONSUMER_KEY'], creds['CONSUMER_SECRET'],creds['ACCESS_TOKEN'],creds['ACCESS_SECRET'])
 
     # Set up our query parameters based on user input
     search1 = coin_symbol
@@ -71,16 +91,17 @@ def gen_sent_graph_twitter(coin_symbol, start_date, end_date):
     TimeSearch = start_date
     TimeSearchEnd = end_date
 
+
     # Create our query
     query = {'q': search1,
-             # 'result_type': 'popular',
-             'count': scount,
-             'lang': slang,
-             'since': TimeSearch,
-             'until': TimeSearchEnd,
-             }
+            # 'result_type': 'popular',
+            'count': scount,
+            'lang': slang,
+            'since': TimeSearch,
+            'until': TimeSearchEnd,
+            }
 
-    # Search tweets for tweets mentioning coin symbol
+    # Search tweets for tweets mentioning stock symbol
     dict_ = {'user': [], 'date': [], 'text': [], 'favorite_count': []}
     for status in python_tweets.search(**query)['statuses']:
         dict_['user'].append(status['user']['screen_name'])
@@ -182,6 +203,8 @@ def gen_sent_graph_twitter(coin_symbol, start_date, end_date):
     json_data = json.dumps(data)
    
     return json_data
+
+
 
 
 def run_coin_twitter(list_coin_symbol, start_date=two_week_ago, end_date=today):

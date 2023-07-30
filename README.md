@@ -14,7 +14,7 @@ Welcome to our new generation platform for crypto currencies investors!
 
 * [Python](https://www.python.org/) - Python is an interpreted, high-level, general-purpose programming language
 * [AWS](https://www.vagrantup.com/) - AWS is comprehensive cloud computing platform offered by Amazon
-* [Twitter-API](https://twitter.com/) - Twitter is a free social networking site where users and broadcast short posts known as tweets.
+* [Reddit-API](https://www.reddit.com/) - Reddit is an American social news aggregation, content rating, and discussion website. 
 
 
 ## Team members

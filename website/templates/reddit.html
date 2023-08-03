@@ -8,6 +8,25 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" crossorigin="anonymous" />
     <title>{% block title %}Reddit Search Analysis{% endblock %}</title>
     <style>
+        body {
+        background-image: url("https://hdqwalls.com/wallpapers/reddit-wide.jpg");
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        margin: 0; /* Remove default margin */
+        padding: 0; /* Remove default padding */
+      }
+      h3
+      {
+        color: gold;
+        font-size: 40px; /* Set the font size of h1 to 36 pixels */
+        text-align: center;
+        text-shadow: 0 0 20px rgb(250, 234, 145);
+      }
+      label
+      { 
+        color: gold;
+      }
 
         .forms {
             display: grid;
@@ -19,12 +38,15 @@
             justify-content: center;
             align-items: center;
         }
+        .home-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+        }
 
         .form-group1 { grid-area: 1 / 3 / 2 / 4; }
         .form-group2 { grid-area: 2 / 3 / 3 / 4; }
-        .form-group3 { grid-area: 3 / 3 / 4 / 4; }
-        .form-group4 { grid-area: 4 / 3 / 5 / 4; }
-        .search-button { grid-area: 5 / 3 / 6 / 4; }
+        .search-button { grid-area: 3 / 3 / 4 / 4; }
     </style>
 
 </head>
@@ -46,21 +68,12 @@
                 <option value="">Select an option</option>
             </select>
         </div>
-        <div class="form-group3">
-            <label for="cryptoCoin3">cryptoCoin #3</label>
-            <select class="form-control" id="cryptoCoin3" name="cryptoCoin3" >
-                <option value="">Select an option</option>
-            </select>
-        </div>
-        <div class="form-group4">
-            <label for="cryptoCoin4">cryptoCoin #4</label>
-            <select class="form-control" id="cryptoCoin4" name="cryptoCoin4" >
-                <option value="">Select an option</option>
-            </select>
-        </div>
         <br><br>
         <div class="search-button">
             <button id="submitBtn" type="submit" class="btn btn-primary">Search</button>
+        </div>
+        <div class="home-btn">
+            <a href="/" class="btn btn-success">Home</a>
         </div>
         </div>
 
@@ -105,8 +118,6 @@
             // Generate options for each select element
             generateOptions("cryptoCoin1");
             generateOptions("cryptoCoin2");
-            generateOptions("cryptoCoin3");
-            generateOptions("cryptoCoin4");
         </script>
     </form>
 </body>

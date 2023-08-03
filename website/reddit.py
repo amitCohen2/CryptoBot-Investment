@@ -11,10 +11,15 @@ from datetime import datetime
 import datetime as DT
 import requests
 import io
+import json
 import base64
+import ccxt
+from datetime import datetime, timedelta
+today = DT.date.today()
+one_week_ago = str(today - DT.timedelta(days=7))
+today = str(today)
 
-
-def gen_sent_graph(stock_symbol, start_date, end_date):
+def gen_sent_graph_reddit(coin_symbol, start_date, end_date):
     nltk.download('popular', quiet=True)
 
     # Credentials for accessing the Reddit API
@@ -28,12 +33,12 @@ def gen_sent_graph(stock_symbol, start_date, end_date):
                          password=password, check_for_async=False)
 
     # Specify the date range
-    date_format = '%d-%m-%Y'
+    date_format = '%Y-%m-%d'
     start_date = datetime.strptime(start_date, date_format)
     end_date = datetime.strptime(end_date, date_format)
 
     # Get all stock name variations
-    names = list(stock_symbol.values())
+    names =coin_symbol# list(coin_symbol.values())
 
     # Query parameters
     search_query = ' OR '.join(names)
@@ -134,90 +139,172 @@ def gen_sent_graph(stock_symbol, start_date, end_date):
                 break
 
     # Get the maximum number of upvotes for normalization
-    sum_upvotes = p_buy + p_sell + p_hold
+    total = p_buy + p_sell + p_hold
 
-    buy_p = round((p_buy), 2)
-    sell_p = round((p_sell), 2)
-    hold_p = round((p_hold), 2)
-
-    # Check if there are any sentiment scores
-    if sum_upvotes == 0:
-        # No sentiment scores, add a message and return
-        return {
-            'graph': None,
-            'symbol': stock_symbol,
-            'message': 'No sentiment data available for the given date range.'
-        }
-
-    # Data for the pie chart
-    labels = ['Buy', 'Sell', 'Hold']
-    sizes = [buy_p, sell_p, hold_p]  # Values corresponding to each label
-
-    # Create the pie chart
-    plt.pie(sizes, labels=labels, autopct='%1.1f%%')
-
-    # Add a title
-    plt.title(f'Sentiment percentage around the stock {names[0]}')
-
-    # Save the chart to a buffer
-    buffer = io.BytesIO()
-    plt.savefig(buffer, format='png')
-    buffer.seek(0)
-
-    # Convert the buffer content to a base64-encoded string
-    graph_base64 = base64.b64encode(buffer.read()).decode()
-
-    # Close the buffer and clear the plot
-    buffer.close()
-    plt.close()
-
-    # Return the base64-encoded graph and symbol
-    return {
-        'graph': graph_base64,
-        'symbol': stock_symbol
+    y_temp = [p_buy, p_sell, p_hold]
+    x_axis = ['Buy', 'Sell', 'Hold']
+    x_axis_categories_values = [p_buy, p_sell, p_hold]
+    if total == 0:
+        percentages = [0, 0, 0]
+    else:
+        percentages = [(sentiment / total) * 100 for sentiment in x_axis_categories_values]
+    data = {
+    "coin name":coin_symbol,
+    "percentages": percentages,
+    "x_axis": x_axis,
+    "x_axis_categories_values": x_axis_categories_values
     }
 
+    json_data = json.dumps(data)
+   
+    return json_data
 
-# Set up default dates to be from 90 days ago till today
-today = datetime.now()
-two_weeks_ago = today - DT.timedelta(weeks=14)
 
-today = datetime.strftime(today, '%d-%m-%Y')
-two_weeks_ago = datetime.strftime(two_weeks_ago, '%d-%m-%Y')
+def convert_symbol_to_keywords(symbol):
+    keywords = []
+    if symbol == 'ETH':
+        keywords = ['#ETHUSD', 'ETH', 'Ethereum', '#ETH']
+    elif symbol == 'USDT':
+        keywords = ['#USDTUSD', 'USDT', '#USDT', 'USDT']
+    elif symbol == 'BTC':
+        keywords = ['#BTCUSD', 'Bitcoin', '#BTC', 'BTC']
+    elif symbol == 'ADA':
+        keywords = ['#ADAUSD', '#ADAUSDT', '#ADA', 'ADA']
+    elif symbol == 'XRP':
+         keywords = ['#XRPUSD', '#XRPUSDT', '#XRP', 'XRP']
+    elif symbol == 'DOGE':
+          keywords = ['#DOGEUSD', '#DOGEUSDT', '#DOGE', 'DOGE']
+    elif symbol == 'DOT':
+        keywords = ['#DOTUSD', '#DOTUSDT', '#DOT', 'DOT']
+    elif symbol == 'UNI':
+        keywords = ['#UNIUSD', '#UNIUSDT', '#UNI', 'UNI']
+    elif symbol == 'ICP':
+        keywords = ['#ICPUSD', '#ICPUSDT', '#ICP', 'ICP']
+    elif symbol == 'BCH':
+        keywords = ['#BCHUSD', '#BCHUSDT', '#BCH', 'BCH']
+    elif symbol == 'LTC':
+        keywords = ['#LTCUSD', '#LTCUSDT', '#LTC', 'LTC']
+    elif symbol == 'LINK':
+        keywords = ['#LINKUSD', '#LINKUSDT', '#LINK', 'LINKUSD']
+    elif symbol == 'MATIC':
+        keywords = ['#MATICUSD', '#MATICUSDT', '#MATIC', 'MATIC']
+    elif symbol == 'SOL':
+        keywords = ['#SOLUSD', '#SOLUSDT', '#SOL', 'SOL']
+    elif symbol == 'ETC':
+        keywords = ['#ETCUSD', '#ETCUSDT', '#ETC', 'ETC']
+    elif symbol == 'XLM':
+        keywords = ['#XLMUSD', '#XLMUSDT', '#XLM', 'XLM']
+    elif symbol == 'THETA':
+        keywords = ['#THETAUSD', '#THETAUSDT', '#THETA', 'THETA']
+    elif symbol == 'VET':
+        keywords = ['#VETUSD', '#VETUSDT', '#VET', 'VET']
+    elif symbol == 'EOS':
+        keywords = ['#EOSUSD', '#EOSUSDT', '#EOS', 'EOS']
+    elif symbol == 'BNB':
+        keywords = ['#BNBUSD', '#BNBUSDT', '#BNB', 'BNB']
+
+    return keywords
 
 reddit_blue_print = Blueprint('reddit', __name__)
-
-
 @reddit_blue_print.route('/reddit', methods=['GET', 'POST'])
 @login_required
-def run_reddit(start_date=two_weeks_ago, end_date=today, **kwargs):
+def run_reddit(start_date=one_week_ago, end_date=today, **kwargs):
     list = []
     coins = []
     if request.method == 'POST':
         coin_name_1 = request.form['cryptoCoin1']
         coin_name_2 = request.form['cryptoCoin2']
-        coin_name_3 = request.form['cryptoCoin3']
-        coin_name_4 = request.form['cryptoCoin4']
         # #BTC , Bitcoin, #BTCUSDT , BTCUSD
-        coin_names = [coin_name_1, coin_name_2, coin_name_3, coin_name_4]
+        coin_names = [coin_name_1, coin_name_2]
         for coin in coin_names:
             if coin.strip():  # Skip if coin is an empty string or contains only whitespace
                 coins.append(coin)
+        historic_data = get_historical_data(coins)
         data_reddit = run_coin_reddit(coins)
-        return render_template('reddit-charts.html', user=current_user, plot_data=data_reddit)
+        json_obj = {}
+        for i, coin in enumerate(data_reddit, start=1):
+            coin_name_key = f'coin_name_{i}'
+            coin_dates_key = f'coin_dates_{i}'
+            coin_prices_key = f'coin_prices_{i}'
+            percentages_key = f'percentages_{i}'
+            x_axis_key = f'x_axis_{i}'
+            x_axis_categories_values_key = f'x_axis_categories_values_{i}'
+
+            json_obj[coin_name_key] = coin['coin name']
+            json_obj[coin_dates_key] = historic_data[i - 1]['dates']
+            json_obj[coin_prices_key] = historic_data[i - 1]['prices']
+            json_obj[percentages_key] = coin['percentages']
+            json_obj[x_axis_key] = coin['x_axis']
+            json_obj[x_axis_categories_values_key] = coin['x_axis_categories_values']
+        json_obj['num_of_coins'] = len(data_reddit)
+        return render_template('reddit-charts.html', user=current_user, plot_data=json_obj)
     else:
         return render_template('reddit.html')
+    
+
+def get_historical_data(symbol_list):
+    exchange = ccxt.binance()
+    coins = []
+    timeframe = '1d'
+    today = datetime.now()
+    start_date = today - timedelta(days=365)
+    end_date = today
+    start_date_timestamp = int(start_date.timestamp() * 1000)
+    end_date_timestamp = int(end_date.timestamp() * 1000)
+
+    for symbol in symbol_list:
+        convert_symbol = symbol + '/USDT'
+        historical_data = exchange.fetch_ohlcv(convert_symbol, timeframe, start_date_timestamp, end_date_timestamp)
+
+        # Extract dates and prices from historical data
+        dates = [datetime.fromtimestamp(item[0] / 1000) for item in historical_data]
+        prices = [item[4] for item in historical_data]  # Closing prices
+
+        coins.append({"name": symbol, "dates": dates, "prices": prices})
+
+    return coins
+    
 
 
-def run_coin_reddit(list_coin_symbol, start_date=two_weeks_ago, end_date=today):
-    res_data = []
+def run_coin_reddit(list_coin_symbol, start_date=one_week_ago, end_date=today):
+    coins = []
     for symbol in list_coin_symbol:
-        coin_data = run_stock(my_symbol=symbol)
-        res_data.append(coin_data)
-    return res_data
+        coin_data = get_data_on_coin(symbol, start_date, end_date)
+        coins.append(coin_data)
+    return coins
+
+def get_data_on_coin(symbol, start_date, end_date):
+    coin = []
+    word_json = {}
+    word__json_array = []
+    percentages = [0,0,0]
+    x_axis_categories_values = [0,0,0]
+    keywords = convert_symbol_to_keywords(symbol)
+    for word in keywords:
+        word_json = gen_sent_graph_reddit(word, start_date, end_date)
+        word__json_array.append(word_json)
+    for json_data in word__json_array:
+        json_data = json.loads(json_data)
+        x_axis_categories_values[0] += json_data.get("x_axis_categories_values", [])[0]
+        x_axis_categories_values[1] += json_data.get("x_axis_categories_values", [])[1]
+        x_axis_categories_values[2] += json_data.get("x_axis_categories_values", [])[2]
+        
+
+    total = x_axis_categories_values[0] + x_axis_categories_values[1] + x_axis_categories_values[2]
+    if total == 0:
+        return {'coin name': symbol, 'percentages': [0,0,0], 'x_axis': ['Buy','Sell','Hold'], 'x_axis_categories_values': [0,0,0]}
+    else:
+        percentages[0] = (x_axis_categories_values[0] / total) * 100
+        percentages[1] = (x_axis_categories_values[1] / total) * 100
+        percentages[2] = (x_axis_categories_values[2] / total) * 100
+
+        return {'coin name': symbol, 'percentages': percentages, 'x_axis': ['Buy','Sell','Hold'], 'x_axis_categories_values': x_axis_categories_values}
 
 
-def run_stock(start_date=two_weeks_ago, end_date=today, **kwargs):
+
+
+
+#def run_stock(start_date=one_week_ago, end_date=today, **kwargs):
     try:
         return gen_sent_graph(kwargs, start_date, end_date)
     except praw.exceptions.APIException as e:

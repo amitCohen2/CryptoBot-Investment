@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <link rel="stylesheet" href="../contrast-bootstrap-pro/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="../contrast-bootstrap-pro/css/cdb.css" />
+  <script src="../contrast-bootstrap-pro/js/cdb.js"></script>
+  <script src="../contrast-bootstrap-pro/js/bootstrap.min.js"></script>
+  <script src="https://kit.fontawesome.com/9d1d9a82d2.js" crossorigin="anonymous"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reddit coins Analysis</title>
+  <style>
+    .chart-container {
+      width: 75%;
+      height: 75%;
+      margin: auto;
+    }
+
+    .coin-label {
+      font-size: 28px;
+    }
+
+    .price-label {
+      font-size: 24px;
+    }
+    
+  </style>
+</head>
+<body>
+  {% for coin_index in range(1, plot_data.num_of_coins + 1) %}
+    {% set coin_name = 'coin_name_' + coin_index|string %}
+    {% set coin_dates = 'coin_dates_' + coin_index|string %}
+    {% set coin_prices = 'coin_prices_' + coin_index|string %}
+    {% set percentages = 'percentages_' + coin_index|string %}
+    {% set x_axis = 'x_axis_' + coin_index|string %}
+    {% set x_axis_categories_values = 'x_axis_categories_values_' + coin_index|string %}
+    <div class="card chart-container">
+      <canvas id="chart_{{ coin_index }}"></canvas>
+    </div>
+    <div class="card chart-container">
+      <canvas id="chart_Bar_{{ coin_index }}"></canvas>
+    </div>
+  {% endfor %}
+
+  <a href="/reddit" class="btn btn-success">Go Back To Reddit Search</a>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.js"></script>
+
+  <script>
+    const data = {{plot_data| tojson | safe}};
+    console.log(data);
+    coins = ['coin_name_1', 'coin_name_2', 'coin_name_3', 'coin_name_4'];
+    rgba = ['rgba(47, 128, 237, 0.8)', 'rgba(223,155,233, 0.8)', 'rgba(138,243,148, 0.8)', 'rgba(240, 148, 157, 0.8)'];
+    rgb = ['rgb(47, 128, 237)', 'rgb(223,155,233)', 'rgb(138,243,148)', 'rgb(240, 148, 157)'];
+    for (let i = 0; i < data.num_of_coins; i++) {
+      const coin = coins[i];
+      const coinIndex = i + 1;
+
+      const ctx = document.getElementById(`chart_${coinIndex}`).getContext('2d');
+      const myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: data[`coin_dates_${coinIndex}`],
+          datasets: [{
+            label: data[`coin_name_${coinIndex}`],
+            backgroundColor: rgba[i],
+            borderColor: rgb[i],
+            data: data[`coin_prices_${coinIndex}`],
+          }]
+        },
+        options: {
+          scales: {
+            yAxes: [{
+              ticks: {
+                beginAtZero: true,
+                callback: function (value, index, values) {
+                  return '$' + value;
+                }
+              }
+            }]
+          },
+          plugins: {
+            legend: {
+              labels: {
+                font: {
+                  size: 28,
+                  style: 'bold'
+                }
+              }
+            }
+          }
+        },
+      });
+
+      const ctxBar = document.getElementById(`chart_Bar_${coinIndex}`).getContext('2d');
+      const myChartBar = new Chart(ctxBar, {
+        type: 'bar',
+        data: {
+          labels: data[`x_axis_${coinIndex}`],
+          datasets: [{
+            label: data[`coin_name_${coinIndex}`] + ' hype',
+            backgroundColor: rgba[i],
+            borderColor: rgb[i],
+            data: data[`percentages_${coinIndex}`],
+          }]
+        },
+        options: {
+          scales: {
+            yAxes: [{
+              ticks: {
+                beginAtZero: true,
+                callback: function (value, index, values) {
+                  return value+'%';
+                }
+              }
+            }]
+          },
+          plugins: {
+            legend: {
+              labels: {
+                font: {
+                  size: 28,
+                  style: 'bold'
+                }
+              }
+            }
+          }
+        },
+      });
+    }
+  </script>
+</body>
+</html>

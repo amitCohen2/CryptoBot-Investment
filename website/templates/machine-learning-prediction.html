@@ -8,6 +8,30 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" crossorigin="anonymous" />
     <title>{% block title %}Machine Learning Prediction{% endblock %}</title>
     <style>
+    body {
+        background-image: url("https://wallpaperaccess.com/full/1846945.jpg");
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        margin: 0; /* Remove default margin */
+        padding: 0; /* Remove default padding */
+      }
+
+      h3
+      {
+        color: gold;
+        font-size: 50px; /* Set the font size of h1 to 36 pixels */
+        text-align: center;
+        text-shadow: 0 0 20px rgb(250, 234, 145);
+      }
+      
+      p
+      {
+        color: gold;
+        font-size: 18px; /* Set the font size of h1 to 36 pixels */
+        text-align: center;
+        text-shadow: 0 0 18px rgb(250, 234, 145);
+      }
         .form-container {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -17,6 +41,11 @@
             text-align: center;
             justify-content: center;
             align-items: center;
+        }
+        .home-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
         }
 
         .header {grid-area: 1 / 2 / 2 / 3;}
@@ -29,13 +58,16 @@
     <form method="POST" class="form-container">
         <h3 align="center" class="header">Choose Your CryptoCoin</h3>
         <div class="form-group">
-            <label for="stock">Choose a stock to predict by machine learning algorithm:</label>
+            <p >Choose a crypto coin to predict by machine learning algorithm:</p>
             <select class="form-control" id="stock" name="stock">
                 <option value="" class="option">Select an option</option>
             </select>
         </div>
         <div class="search-button">
             <button id="submitBtn" type="submit" class="btn btn-primary">Search</button>
+        </div>
+        <div class="home-btn">
+            <a href="/" class="btn btn-success">Home</a>
         </div>
         <script>
             // Define an array of stocks names
@@ -78,5 +110,6 @@
             generateOptions("stock");
         </script>
     </form>
+    
 </body>
 </html>

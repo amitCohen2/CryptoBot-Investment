@@ -1,28 +1,51 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <link
-              rel="stylesheet"
-              href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-              integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
-              crossorigin="anonymous"
-            />
-            <link
-              rel="stylesheet"
-              href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
-              crossorigin="anonymous"
-            />
-            <link rel="stylesheet" type="text/css" href="style.css">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+      integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <style>
+      body {
+        background-image: url("https://wallpapersmug.com/download/3840x2400/3e0156/bitcoin-digital-art-abstract.jpg");
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        margin: 0; /* Remove default margin */
+        padding: 0; /* Remove default padding */
+      }
+      h1
+      {
+        color: gold;
+        font-size: 50px; /* Set the font size of h1 to 36 pixels */
+        text-align: center;
+        text-shadow: 0 0 20px rgb(250, 234, 145);
+      }
+      h2
+      {
+        color: gold;
+        padding-left: 20px;
+        padding-top: 10px;
+      }
+      .buttons {
+        padding-left: 20px;
+        padding-top: 10px;
+      }
+    </style>
             <title>{% block title %}Home{% endblock %}</title>
-        <style>
-            h1, p , .buttons {
-                padding-left: 20px;
-            }
-        </style>
     </head>
     <body>
+     
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <a class="navbar-brand" href="#">
                 <img src="https://github.com/amitCohen2/CryptoBot-Investment/blob/main/static/images/CryptoBot_Investment-navbar.png?raw=true"
@@ -92,21 +115,18 @@
             <div class="div2"> </div>
         </div>
         <h1>Welcome to CryptoBot-Investment</h1>
-        <p>
+        <h2>
             CryptoBot-Investment is an integrated platform for investors,<br>
             combining three key components:<br>
             1. Arbitrage algorithm for Cryptocurrencies.<br>
             2. NLP-based Reddit sentiment analysis for buy/sell/hold recommendations in Cryptocurrencies.<br>
             3. Stock price prediction by machine learning algorithm.
-        </p>
+        </h2>
         <div class="buttons">
             <a href="/arbitrage-input" class="btn btn-primary">Arbitrage</a>
             <a href="/reddit" class="btn btn-warning">Reddit</a>
             <a href="/machine-learning" class="btn btn-success">Machine Learning</a>
         </div>
-
-
-
         <div class="container">{% block content %} {% endblock %}</div>
         <script
           src="https://code.jquery.com/jquery-3.2.1.slim.min.js"

@@ -1,12 +1,24 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="stylesheet" href="style.css"/>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" crossorigin="anonymous" />
+
     <title>Arbitrage</title>
     <style>
 
         body {
             font-family: Arial, sans-serif;
             text-align: center;
+            background-image: url("https://static.vecteezy.com/system/resources/previews/014/462/176/original/economy-and-finance-background-financial-business-statistics-with-candlesticks-and-bar-chart-vector.jpg");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            margin: 0; /* Remove default margin */
+            padding: 0; /* Remove default padding */
         }
 
         .submit-button {
@@ -25,15 +37,33 @@
             color: #13aa52;
             border-color: #13aa52;
         }
+        h1
+      {
+        top: 30px;
+        color: gold;
+        font-size: 50px; /* Set the font size of h1 to 36 pixels */
+        text-align: center;
+        text-shadow: 0 0 20px rgb(250, 234, 145);
+      }
+      label
+      {
+        color: gold;
+        font-size: 20px; /* Set the font size of h1 to 36 pixels */
+      }
 
         .submit-button:hover {
             color: #fff;
             background-color: #13aa52;
             border-color: #13aa52;
         }
+        .home-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+        }
     </style>
 </head>
-<body>
+<body><br>
     <h1>Arbitrage</h1><br>
 
     <form action="/arbitrage" method="POST">
@@ -42,6 +72,9 @@
                title="Please enter a valid integer number" required>
         <br><br>
         <input type="submit" value="Submit" class="submit-button">
+        <div class="home-btn">
+            <a href="/" class="btn btn-success">Home</a>
+        </div>
     </form>
 </body>
 </html>

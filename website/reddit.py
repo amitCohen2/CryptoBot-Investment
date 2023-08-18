@@ -243,7 +243,8 @@ def run_reddit(start_date=one_week_ago, end_date=today, **kwargs):
     
 
 def get_historical_data(symbol_list):
-    exchange = ccxt.binance()
+    exchange = ccxt.kraken()
+    #exchange = ccxt.binance()
     coins = []
     timeframe = '1d'
     today = datetime.now()

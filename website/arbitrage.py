@@ -155,7 +155,7 @@ def calculate_with_fee(sell_price, buy_price, buy_platform, sell_platform):
         return 0
 
     # calculate buy fees
-    if buy_platform == binance or buy_platform == kucoin:
+    if buy_platform == kucoin:
         buy_fees = buy_price * FLAT_FEE
     elif buy_platform == kraken:
         buy_fees = buy_price * KRAKEN_BUY_FEE
@@ -165,7 +165,7 @@ def calculate_with_fee(sell_price, buy_price, buy_platform, sell_platform):
         return 0
 
     # calculate sell fees = (profit after sell fees) - (buy fees)
-    if sell_platform == sell_platform == binance or sell_platform == kucoin:
+    if sell_platform == sell_platform ==  kucoin:
         return (bruto_profit * (1 - FLAT_FEE)) - buy_fees
     elif sell_platform == kraken:
         return (bruto_profit * (1 - KRAKEN_SELL_FEE)) - buy_fees
@@ -184,11 +184,11 @@ def calculate_buying_precent(ask_price, bid_price, ask_market, my_wallet):
 
 
 # Create the exchanges
-binance = ccxt.binance()
+#binance = ccxt.binance()
 kraken = ccxt.kraken()
 kucoin = ccxt.kucoin()
 bitstamp = ccxt.bitstamp()
-binance.load_markets()
+#binance.load_markets()
 kraken.load_markets()
 kucoin.load_markets()
 bitstamp.load_markets()
@@ -205,12 +205,12 @@ def arbitrage_input():
 '''
     init global variables for markets, wallets, symbols 
 '''
-markets = [binance, kraken, kucoin, bitstamp]
-binance_wallet = {"BTC": 0.1, "ETH": 0.5, "LTC": 1.0, "USDT": 0.0}
+markets = [ kraken, kucoin, bitstamp]
+#binance_wallet = {"BTC": 0.1, "ETH": 0.5, "LTC": 1.0, "USDT": 0.0}
 kraken_wallet = {"BTC": 0.1, "ETH": 0.5, "LTC": 1.0, "USDT": 0.0}
 kucoin_wallet = {"BTC": 0.1, "ETH": 0.5, "LTC": 1.0, "USDT": 0.0}
 bitstamp_wallet = {"BTC": 0.1, "ETH": 0.1, "LTC": 1.0, "USDT": 0.0}
-my_wallet = {"Binance": binance_wallet,
+my_wallet = {
              "Kraken": kraken_wallet,
              "KuCoin": kucoin_wallet,
              "Bitstamp": bitstamp_wallet}
@@ -251,7 +251,6 @@ def init_wallets_from_user_input():
             print("The User doesn't enter a new invest input!")
 
     if is_user_insert_input:
-        binance_wallet["USDT"] = stock_amount
         kraken_wallet["USDT"] = stock_amount
         kucoin_wallet["USDT"] = stock_amount
         bitstamp_wallet["USDT"] = stock_amount

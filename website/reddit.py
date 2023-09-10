@@ -16,7 +16,7 @@ import base64
 import ccxt
 from datetime import datetime, timedelta
 today = DT.date.today()
-one_week_ago = str(today - DT.timedelta(days=7))
+ten_days_ago = str(today - DT.timedelta(days=10))
 today = str(today)
 
 def gen_sent_graph_reddit(coin_symbol, start_date, end_date):
@@ -176,10 +176,10 @@ def convert_symbol_to_keywords(symbol):
           keywords = ['#DOGEUSD', '#DOGEUSDT', '#DOGE', 'DOGE']
     elif symbol == 'DOT':
         keywords = ['#DOTUSD', '#DOTUSDT', '#DOT', 'DOT']
-    elif symbol == 'UNI':
-        keywords = ['#UNIUSD', '#UNIUSDT', '#UNI', 'UNI']
-    elif symbol == 'ICP':
-        keywords = ['#ICPUSD', '#ICPUSDT', '#ICP', 'ICP']
+    #elif symbol == 'UNI':
+    #    keywords = ['#UNIUSD', '#UNIUSDT', '#UNI', 'UNI']
+    #elif symbol == 'ICP':
+    #    keywords = ['#ICPUSD', '#ICPUSDT', '#ICP', 'ICP']
     elif symbol == 'BCH':
         keywords = ['#BCHUSD', '#BCHUSDT', '#BCH', 'BCH']
     elif symbol == 'LTC':
@@ -190,25 +190,25 @@ def convert_symbol_to_keywords(symbol):
         keywords = ['#MATICUSD', '#MATICUSDT', '#MATIC', 'MATIC']
     elif symbol == 'SOL':
         keywords = ['#SOLUSD', '#SOLUSDT', '#SOL', 'SOL']
-    elif symbol == 'ETC':
-        keywords = ['#ETCUSD', '#ETCUSDT', '#ETC', 'ETC']
-    elif symbol == 'XLM':
-        keywords = ['#XLMUSD', '#XLMUSDT', '#XLM', 'XLM']
-    elif symbol == 'THETA':
-        keywords = ['#THETAUSD', '#THETAUSDT', '#THETA', 'THETA']
-    elif symbol == 'VET':
-        keywords = ['#VETUSD', '#VETUSDT', '#VET', 'VET']
+   # elif symbol == 'ETC':
+  #      keywords = ['#ETCUSD', '#ETCUSDT', '#ETC', 'ETC']
+    #elif symbol == 'XLM':
+    #    keywords = ['#XLMUSD', '#XLMUSDT', '#XLM', 'XLM']
+    #elif symbol == 'THETA':
+    #    keywords = ['#THETAUSD', '#THETAUSDT', '#THETA', 'THETA']
+    #elif symbol == 'VET':
+    #    keywords = ['#VETUSD', '#VETUSDT', '#VET', 'VET']
     elif symbol == 'EOS':
         keywords = ['#EOSUSD', '#EOSUSDT', '#EOS', 'EOS']
-    elif symbol == 'BNB':
-        keywords = ['#BNBUSD', '#BNBUSDT', '#BNB', 'BNB']
+    #elif symbol == 'BNB':
+    #    keywords = ['#BNBUSD', '#BNBUSDT', '#BNB', 'BNB']
 
     return keywords
 
 reddit_blue_print = Blueprint('reddit', __name__)
 @reddit_blue_print.route('/reddit', methods=['GET', 'POST'])
 @login_required
-def run_reddit(start_date=one_week_ago, end_date=today, **kwargs):
+def run_reddit(start_date=ten_days_ago, end_date=today, **kwargs):
     list = []
     coins = []
     if request.method == 'POST':
@@ -267,7 +267,7 @@ def get_historical_data(symbol_list):
     
 
 
-def run_coin_reddit(list_coin_symbol, start_date=one_week_ago, end_date=today):
+def run_coin_reddit(list_coin_symbol, start_date=ten_days_ago, end_date=today):
     coins = []
     for symbol in list_coin_symbol:
         coin_data = get_data_on_coin(symbol, start_date, end_date)
@@ -305,7 +305,7 @@ def get_data_on_coin(symbol, start_date, end_date):
 
 
 
-#def run_stock(start_date=one_week_ago, end_date=today, **kwargs):
+#def run_stock(start_date=ten_days_ago, end_date=today, **kwargs):
     try:
         return gen_sent_graph(kwargs, start_date, end_date)
     except praw.exceptions.APIException as e:

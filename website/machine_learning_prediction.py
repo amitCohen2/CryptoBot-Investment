@@ -510,7 +510,7 @@ def run_machine_learning_prediction():
         add_to_encoded_list(fig)
         
         result_message = "Predicted close price of the next trading day: " + \
-                         str(round(to_plot_data_y_test_pred[plot_range - 1], 2))
+                         str(round(to_plot_data_y_test_pred[plot_range - 1], 3))
         print(result_message)
         return render_template('machine-learning-charts.html',
                                user=current_user,

@@ -84,7 +84,7 @@ def download_data(config):
     # Calculate the start date as 10 years ago from the current date
     end_date = datetime.now().timestamp()
     start_date = (datetime.now() - timedelta(days=365 * 10)).timestamp()
-    exchange = ccxt.binance()
+    exchange = ccxt.kraken()
    
     today = datetime.now()
     start_date = today - timedelta(days=365)
